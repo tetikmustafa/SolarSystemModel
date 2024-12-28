@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // Renderer kurulumu
-const renderer = new THREE.WebGLRenderer({alpha:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+const renderer = new THREE.WebGLRenderer({alpha:true}); //renderer oluşturduk
+renderer.setSize(window.innerWidth, window.innerHeight); //boyutunu ayarladık
+document.body.appendChild(renderer.domElement); //html'e ekledik
 
 // Sahne ve kamera
 const scene = new THREE.Scene();
@@ -36,27 +36,27 @@ const sun = new THREE.Mesh(sunGeo, sunMat);
 scene.add(sun);
 
 // Gezegen Oluşturma Fonksiyonu
-function createPlanet(size, texture, position) {
+function createPlanet(size, texture, position, axialTilt) {
     const geo = new THREE.SphereGeometry(size, 30, 30);
     const mat = new THREE.MeshStandardMaterial({
         map: textureLoader.load(texture)
     });
     const planet = new THREE.Mesh(geo, mat);
     planet.position.x = position;
+    planet.rotation.z = THREE.MathUtils.degToRad(axialTilt); // Eksen eğikliği
     scene.add(planet);
     return planet;
 }
 
-
 // Gezegenler
-const mercury = createPlanet(0.38, './src/img/mercury.jpg', 12);
-const venus = createPlanet(0.95, './src/img/venus.jpg', 22);
-const earth = createPlanet(1, './src/img/earth.jpg', 30);
-const mars = createPlanet(0.53, './src/img/mars.jpg', 45);
-const jupiter = createPlanet(11.2, './src/img/jupiter.jpg', 156);
-const saturn = createPlanet(9.45, './src/img/saturn.jpg', 286);
-const uranus = createPlanet(4.0, './src/img/uranus.jpg', 576);
-const neptune = createPlanet(3.88, './src/img/neptune.jpg', 900);
+const mercury = createPlanet(0.38, './src/img/mercury.jpg', 12, 0.034);
+const venus = createPlanet(0.95, './src/img/venus.jpg', 22, 177.4);
+const earth = createPlanet(1, './src/img/earth.jpg', 30, 23.5);
+const mars = createPlanet(0.53, './src/img/mars.jpg', 45, 25.2);
+const jupiter = createPlanet(11.2, './src/img/jupiter.jpg', 156, 3.1);
+const saturn = createPlanet(9.45, './src/img/saturn.jpg', 286, 26.7);
+const uranus = createPlanet(4.0, './src/img/uranus.jpg', 576, 97.8);
+const neptune = createPlanet(3.88, './src/img/neptune.jpg', 900, 28.3);
 
 // Pivotlar (Yörüngesel Dönüş İçin)
 const mercuryPivot = new THREE.Object3D();
@@ -114,13 +114,13 @@ const moonOrbitGeometry = new THREE.BufferGeometry().setFromPoints(
 
 const moonOrbitMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
 const moonOrbitLine = new THREE.Line(moonOrbitGeometry, moonOrbitMaterial);
-earth.add(moonOrbitLine); // Yörüngeyi Dünya'ya ekle
+earth.add(moonOrbitLine); // Yörüngeyi Dünya'ya ekler
 
 // Ay (Moon) Pivot ve Ay
 const moonPivot = new THREE.Object3D();
 earthPivot.add(moonPivot);
 
-const moon = createPlanet(0.27, './src/img/moon.jpg', moonOrbitRadius);
+const moon = createPlanet(0.27, './src/img/moon.jpg', moonOrbitRadius, 6.68); // Ay eksen eğikliği 6.68°
 moonPivot.add(moon);
 
 earth.add(moon); // Ay'ı Dünya'ya ekle
