@@ -102,7 +102,7 @@ neptune.position.set(910, 0, 0);
 const moonOrbitRadius = 5; // Ay yörünge yarıçapı
 const moonOrbitCurve = new THREE.EllipseCurve(
     0, 0, // Dünya'nın merkezi
-    moonOrbitRadius, moonOrbitRadius, // Elips yarıçapları (daire için aynı)
+    moonOrbitRadius, moonOrbitRadius*.9970, // Elips yarıçapları (daire için aynı)
     0, 2 * Math.PI, // Başlangıç ve bitiş açıları
     false // Saat yönünde çizim
 );
@@ -205,6 +205,39 @@ function updateTrails() {
     });
 }
 
+const planetPivots = [mercuryPivot, venusPivot, earthPivot, marsPivot, jupiterPivot, saturnPivot, uranusPivot, neptunePivot];
+const planetObjects = [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune];
+const planetOrbitRadius = [22, 32, 40, 55, 166, 296, 586, 910];
+const planetOrbitRatios = [
+    0.9787,  // Mercury
+    0.99997, // Venus
+    0.99986, // Earth
+    0.9958,  // Mars
+    0.9976,  // Jupiter
+    0.9973,  // Saturn
+    0.9980,  // Uranus
+    0.99998  // Neptune
+];
+
+planetObjects.forEach((planet, index) => {
+    const orbitCurve = new THREE.EllipseCurve(
+        0, 0,
+        planetOrbitRadius[index],
+        planetOrbitRadius[index] * planetOrbitRatios[index],
+        0, 2 * Math.PI,
+        false
+    );
+
+    const orbitPoints = orbitCurve.getPoints(100);
+    const orbitGeometry = new THREE.BufferGeometry().setFromPoints(
+        orbitPoints.map((p) => new THREE.Vector3(p.x, 0, p.y))
+    );
+
+    const orbitMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+    const orbitLine = new THREE.Line(orbitGeometry, orbitMaterial);
+    sun.add(orbitLine);
+});
+
 // Animasyon
 function animate() {
     sun.rotateY(0.002);
@@ -230,7 +263,7 @@ function animate() {
 
     moonPivot.rotateY(0.03);
 
-    updateTrails(); // İzleri güncelle
+    // updateTrails(); // İzleri güncelle
 
     renderer.render(scene, camera);
 }
